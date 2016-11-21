@@ -1,10 +1,10 @@
 package com.yueweather.app.util;
 
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -18,6 +18,8 @@ import java.net.URL;
  */
 
 public class HttpUtil {
+    private static String tag = "YUEWEATHER";
+
     public static void sendHttpRequest(final String address, final  HttpCallbackListener listener){
         new Thread(new Runnable() {
             @Override
@@ -29,6 +31,7 @@ public class HttpUtil {
                     connection.setRequestMethod("GET");
                     connection.setConnectTimeout(8000);
                     connection.setReadTimeout(8000);
+                    connection.setRequestProperty("Accept-Encoding", "UTF-8");
                     InputStream inputStream = connection.getInputStream();
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                     StringBuilder response = new StringBuilder();
@@ -40,7 +43,7 @@ public class HttpUtil {
                         listener.onFinish(response.toString());
                     }
                 } catch (Exception e) {
-                  //  e.printStackTrace();
+                    e.printStackTrace();
                     if (listener != null){
                         listener.onError(e);
                     }
@@ -49,6 +52,7 @@ public class HttpUtil {
                         connection.disconnect();
                     }
                 }
+
             }
         }).start();
     }

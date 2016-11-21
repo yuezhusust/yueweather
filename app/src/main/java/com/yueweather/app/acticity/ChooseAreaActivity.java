@@ -1,10 +1,12 @@
 package com.yueweather.app.acticity;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.util.Log;
+
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -28,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ChoooseAreaActivity extends BaseActivity {
+public class ChooseAreaActivity extends BaseActivity {
     public static final  int LEVEL_PROVINCE = 0;
     public static final  int LEVEL_CITY = 1;
     public static final int LEVEL_COUNTY = 2;
@@ -44,12 +46,14 @@ public class ChoooseAreaActivity extends BaseActivity {
     private List<County> countyList;
     private Province selectedProvince;
     private City selectedCity;
+    private County selectedCounty;
     private int currentLevel;
-    private final String tag ="YUEWEATHER";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        judgeFrom();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.choose_area);
         titleText = (TextView) findViewById(R.id.title_text);
@@ -66,11 +70,29 @@ public class ChoooseAreaActivity extends BaseActivity {
                 }else if(currentLevel == LEVEL_CITY){
                     selectedCity = cityList.get(i);
                     queryCounties();
+                }else if(currentLevel == LEVEL_COUNTY){
+                    selectedCounty = countyList.get(i);
+                    String countyCode = selectedCounty.getCountyCode();
+                    Intent intent = new Intent(ChooseAreaActivity.this,WeatherActivity.class);
+                    intent.putExtra("county_code",countyCode);
+                    startActivity(intent);
+                    finish();
+
                 }
             }
         });
         queryProvinces();
 
+    }
+
+    private void judgeFrom() {
+        SharedPreferences pfs = PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
+        if(pfs.getBoolean("city_selected",false)){
+            Intent intent = new Intent(this,WeatherActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
     }
 
     @Override
@@ -111,7 +133,7 @@ public class ChoooseAreaActivity extends BaseActivity {
             titleText.setText(selectedProvince.getProvinceName());
             currentLevel = LEVEL_CITY;
         }else {
-            LogUtil.d(tag,"is empty");
+            LogUtil.d(LogUtil.TAG,"is empty");
             queryFromServer(selectedProvince.getProvinceCode(),"city");
         }
     }
@@ -149,9 +171,9 @@ public class ChoooseAreaActivity extends BaseActivity {
                 }else if("city".equals(type)){
                     result = Utility.handleCitiesResponse(yueWeatherDB,response,selectedProvince.getId());
                 }else if("county".equals(type)){
-                    LogUtil.d(tag,"go therr");
+                    LogUtil.d(LogUtil.TAG,"go therr");
                     result = Utility.handleCountiesResponse(yueWeatherDB,response,selectedCity.getId());
-                    LogUtil.d(tag,"the result is=="+result);
+                    LogUtil.d(LogUtil.TAG,"the result is=="+result);
                 }
                 if (result){
                     runOnUiThread(new Runnable() {
@@ -159,11 +181,11 @@ public class ChoooseAreaActivity extends BaseActivity {
                         public void run() {
                             closeProgressDialog();
                             if ("province".equals(type)){
-                                queryProvinces();
+                               queryProvinces();
                             }else if ("city".equals(type)){
                                 queryCities();
                             }else if ("county".equals(type)){
-                                LogUtil.d(tag,"county");
+                                LogUtil.d(LogUtil.TAG,"county");
                                 queryCounties();
                             }
                         }

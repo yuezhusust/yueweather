@@ -1,12 +1,24 @@
 package com.yueweather.app.util;
 
-import android.text.TextUtils;
-import android.util.Log;
 
+import android.content.SharedPreferences;
+
+import android.preference.PreferenceManager;
+import android.text.TextUtils;
+
+
+import com.yueweather.app.MyApplication;
 import com.yueweather.app.model.City;
 import com.yueweather.app.model.County;
 import com.yueweather.app.model.Province;
 import com.yueweather.app.model.YueWeatherDB;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * 项目名称：YueWeather
@@ -71,5 +83,37 @@ public class Utility {
 
         }
         return false;
+    }
+
+    public static void  handleWeatherResponse(String response){
+        try {
+            LogUtil.d(LogUtil.TAG,"the response is=="+response);
+            JSONObject jsonObject = new JSONObject(response);
+            JSONObject weatherInfo = jsonObject.getJSONObject("weatherinfo");
+            String cityName = weatherInfo.getString("city");
+            String weatherCode = weatherInfo.getString("cityid");
+            String temp1 = weatherInfo.getString("temp1");
+            String temp2 = weatherInfo.getString("temp2");
+            String weatherDesp = weatherInfo.getString("weather");
+            String publishTime = weatherInfo.getString("ptime");
+            saveWeatherInfo(cityName,weatherCode,temp1,temp2,weatherDesp,publishTime);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void saveWeatherInfo(String cityName, String weatherCode, String temp1, String temp2, String weatherDesp, String publishTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年M月d日",Locale.CHINA);
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext()).edit();
+        editor.putBoolean("city_selected",true);
+        editor.putString("city_name",cityName);
+        editor.putString("weather_code",weatherCode);
+        editor.putString("temp1",temp1);
+        editor.putString("temp2",temp2);
+        editor.putString("weather_desp",weatherDesp);
+        editor.putString("publish_time",publishTime);
+        editor.putString("current_date",sdf.format(new Date()));
+        editor.commit();
     }
 }
