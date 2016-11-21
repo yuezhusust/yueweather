@@ -1,6 +1,7 @@
 package com.yueweather.app.util;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.yueweather.app.model.City;
 import com.yueweather.app.model.County;
@@ -25,8 +26,8 @@ public class Utility {
                 for (String p: allProvinces){
                     String[] array = p.split("\\|");
                     Province province = new Province();
-                    province.setProvinceName(array[0]);
-                    province.setProvinceCode(array[1]);
+                    province.setProvinceName(array[1]);
+                    province.setProvinceCode(array[0]);
                     yueWeatherDB.saveProvince(province);
                 }
                return true;
@@ -42,8 +43,8 @@ public class Utility {
                for (String c: allCities){
                    String[] array = c.split("\\|");
                    City city = new City();
-                   city.setCityName(array[0]);
-                   city.setCityCode(array[1]);
+                   city.setCityName(array[1]);
+                   city.setCityCode(array[0]);
                    city.setProvinceId(provinceId);
                    yueWeatherDB.saveCity(city);
                }
@@ -60,9 +61,10 @@ public class Utility {
                 for(String c:allCounties){
                    String[] array = c.split("\\|");
                     County county = new County();
-                    county.setCountyName(array[0]);
-                    county.setCountyCode(array[1]);
+                    county.setCountyName(array[1]);
+                    county.setCountyCode(array[0]);
                     county.setCityId(cityId);
+                    yueWeatherDB.saveCounty(county);
                 }
                 return true;
             }

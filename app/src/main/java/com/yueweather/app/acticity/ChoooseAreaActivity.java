@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -20,6 +21,7 @@ import com.yueweather.app.model.Province;
 import com.yueweather.app.model.YueWeatherDB;
 import com.yueweather.app.util.HttpCallbackListener;
 import com.yueweather.app.util.HttpUtil;
+import com.yueweather.app.util.LogUtil;
 import com.yueweather.app.util.Utility;
 
 import java.util.ArrayList;
@@ -43,6 +45,8 @@ public class ChoooseAreaActivity extends BaseActivity {
     private Province selectedProvince;
     private City selectedCity;
     private int currentLevel;
+    private final String tag ="YUEWEATHER";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,6 +111,7 @@ public class ChoooseAreaActivity extends BaseActivity {
             titleText.setText(selectedProvince.getProvinceName());
             currentLevel = LEVEL_CITY;
         }else {
+            LogUtil.d(tag,"is empty");
             queryFromServer(selectedProvince.getProvinceCode(),"city");
         }
     }
@@ -133,6 +138,7 @@ public class ChoooseAreaActivity extends BaseActivity {
         }else {
             address = "http://www.weather.com.cn/data/list3/city.xml";
         }
+
         showProgressDialog();
         HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
             @Override
@@ -143,7 +149,9 @@ public class ChoooseAreaActivity extends BaseActivity {
                 }else if("city".equals(type)){
                     result = Utility.handleCitiesResponse(yueWeatherDB,response,selectedProvince.getId());
                 }else if("county".equals(type)){
+                    LogUtil.d(tag,"go therr");
                     result = Utility.handleCountiesResponse(yueWeatherDB,response,selectedCity.getId());
+                    LogUtil.d(tag,"the result is=="+result);
                 }
                 if (result){
                     runOnUiThread(new Runnable() {
@@ -155,6 +163,7 @@ public class ChoooseAreaActivity extends BaseActivity {
                             }else if ("city".equals(type)){
                                 queryCities();
                             }else if ("county".equals(type)){
+                                LogUtil.d(tag,"county");
                                 queryCounties();
                             }
                         }
