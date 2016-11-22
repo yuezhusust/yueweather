@@ -87,7 +87,8 @@ public class ChooseAreaActivity extends BaseActivity {
 
     private void judgeFrom() {
         SharedPreferences pfs = PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
-        if(pfs.getBoolean("city_selected",false)){
+        Boolean fromWeather = this.getIntent().getBooleanExtra("fromWeather",false);
+        if(pfs.getBoolean("city_selected",false) && !fromWeather){
             Intent intent = new Intent(this,WeatherActivity.class);
             startActivity(intent);
             finish();
@@ -102,6 +103,10 @@ public class ChooseAreaActivity extends BaseActivity {
        }else if(currentLevel == LEVEL_CITY){
            queryProvinces();
        }else {
+           if (this.getIntent().getBooleanExtra("fromWeather",false)){
+               Intent intent = new Intent(this,WeatherActivity.class);
+               startActivity(intent);
+           }
            finish();
        }
     }

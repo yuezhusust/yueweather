@@ -13,7 +13,7 @@ import android.content.Context;
  * 修改备注：
  */
 public class MyApplication extends Application {
-    public static Context context;
+    private static Context context;
     public  static Context getContext(){
          return  context;
     }

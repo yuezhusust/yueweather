@@ -1,11 +1,13 @@
 package com.yueweather.app.acticity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -24,6 +26,8 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
     private TextView temp1Text;
     private TextView temp2Text;
     private TextView currentDateText;
+    private Button switchBtn;
+    private Button refreshBtn;
 
 
     @Override
@@ -37,6 +41,10 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
         weatherDespText = (TextView) findViewById(R.id.weather_desp);
         temp1Text = (TextView) findViewById(R.id.temp1);
         temp2Text = (TextView) findViewById(R.id.temp2);
+        switchBtn = (Button) findViewById(R.id.switch_city);
+        refreshBtn = (Button) findViewById(R.id.refresh);
+        switchBtn.setOnClickListener(this);
+        refreshBtn.setOnClickListener(this);
         currentDateText = (TextView) findViewById(R.id.current_date);
         String countyCode = this.getIntent().getStringExtra("county_code");
         if (!TextUtils.isEmpty(countyCode)){
@@ -54,7 +62,7 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
         cityNameText.setText(prefs.getString("city_name",""));
         temp1Text.setText(prefs.getString("temp1",""));
-        temp1Text.setText(prefs.getString("temp2",""));
+        temp2Text.setText(prefs.getString("temp2",""));
         publishText.setText("今天"+prefs.getString("publish_time","")+"发布");
         weatherDespText.setText(prefs.getString("weather_desp",""));
         currentDateText.setText(prefs.getString("current_date",""));
@@ -108,6 +116,20 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
 
     @Override
     public void onClick(View view) {
+        if (view.getId() == R.id.switch_city){
+            Intent intent = new Intent(this,ChooseAreaActivity.class);
+            intent.putExtra("fromWeather",true);
+            startActivity(intent);
+            finish();
+
+        }else if (view.getId() == R.id.refresh){
+            publishText.setText("同步中...");
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
+            String weatherCode = sharedPreferences.getString("weather_code","");
+            if (!TextUtils.isEmpty(weatherCode)){
+                queryWeatherInfo(weatherCode,"weatherCode");
+            }
+        }
 
     }
 }
