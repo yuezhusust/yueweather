@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.yueweather.app.MyApplication;
 import com.yueweather.app.R;
+import com.yueweather.app.service.AutoUpdateService;
 import com.yueweather.app.util.HttpCallbackListener;
 import com.yueweather.app.util.HttpUtil;
 import com.yueweather.app.util.LogUtil;
@@ -68,6 +69,9 @@ public class WeatherActivity extends BaseActivity implements View.OnClickListene
         currentDateText.setText(prefs.getString("current_date",""));
         linearLayout.setVisibility(View.VISIBLE);
         cityNameText.setVisibility(View.VISIBLE);
+
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        this.startService(intent);
     }
 
     private void queryWeatherCode(String countyCode) {
